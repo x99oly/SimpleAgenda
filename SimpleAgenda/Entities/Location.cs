@@ -8,41 +8,49 @@ namespace SimpleAgenda.Entities
 {
     internal class Location : IDtoConvertable<LocationDto>, IPublicDtoConvertable<LocationOutDto>
     {
-        internal string Street { get; private set; }
-        internal string City { get; private set; }
         internal string PostalCode { get; private set; }
-        internal string Country { get; private set; }
+        internal string Street { get; private set; }
+        internal string Number { get; private set; }
+        internal string Neighborhood { get; private set; }
+        internal string City { get; private set; }
         internal BrazilStatesEnum State { get; private set; }
+        internal string Country { get; private set; }
         internal string Complement { get; private set; }
 
-        internal Location(string street, string city, string postalCode, string country, string state, string complement = "")
+        internal Location(string postalCode, string street, string number, string neighborhood, string city, string country, string state, string complement = "")
         {
-            Street = street.NullOrEmptyValidator();
-            City = city.NullOrEmptyValidator();
             PostalCode = PostalCodeValidator(postalCode);
+            Street = street.NullOrEmptyValidator();
+            Number = number.NullOrEmptyValidator();
+            Neighborhood = neighborhood.NullOrEmptyValidator();
+            City = city.NullOrEmptyValidator();
             Country = country.NullOrEmptyValidator();
             State = StateValidator(state);
             Complement = complement.NullOrEmptyValidator();
         }
 
-        public Location(SimpleAgenda.DTOS.Internals.LocationDto dto)
+        public Location(LocationDto dto)
         {
-            Street = dto.Street.NullOrEmptyValidator();
-            City = dto.City.NullOrEmptyValidator();
             PostalCode = PostalCodeValidator(dto.PostalCode);
+            Street = dto.Street.NullOrEmptyValidator();
+            Number = dto.Number.NullOrEmptyValidator();
+            Neighborhood = dto.Neiborhood.NullOrEmptyValidator();
+            City = dto.City.NullOrEmptyValidator();
             Country = dto.Country.NullOrEmptyValidator();
             State = StateValidator(dto.State.ToString());
-            Complement = dto.Complement != null ? dto.Complement : string.Empty;
+            Complement = dto.Complement ?? string.Empty;
         }
 
-        public Location(SimpleAgenda.DTOS.Publics.LocationOutDto dto)
+        public Location(LocationOutDto dto)
         {
-            Street = dto.Street.NullOrEmptyValidator();
-            City = dto.City.NullOrEmptyValidator();
             PostalCode = PostalCodeValidator(dto.PostalCode);
+            Street = dto.Street.NullOrEmptyValidator();
+            Number = dto.Number.NullOrEmptyValidator();
+            Neighborhood = dto.Neighborhood.NullOrEmptyValidator();
+            City = dto.City.NullOrEmptyValidator();
             Country = dto.Country.NullOrEmptyValidator();
             State = StateValidator(dto.State.ToString());
-            Complement = dto.Complement != null ? dto.Complement : string.Empty;
+            Complement = dto.Complement ?? string.Empty;
         }
 
         private static string PostalCodeValidator(string value)
@@ -66,11 +74,13 @@ namespace SimpleAgenda.Entities
         {
             return new LocationOutDto
             {
-                Street = Street,
-                City = City,
                 PostalCode = PostalCode,
-                Country = Country,
+                Street = Street,
+                Number = Number,
+                Neighborhood = Neighborhood,
+                City = City,
                 State = State,
+                Country = Country,
                 Complement = Complement
             };
         }
@@ -79,25 +89,28 @@ namespace SimpleAgenda.Entities
         {
             return new LocationDto
             {
-                Street = Street,
-                City = City,
                 PostalCode = PostalCode,
-                Country = Country,
+                Street = Street,
+                Number = Number,
+                Neiborhood = Neighborhood,
+                City = City,
                 State = State,
+                Country = Country,
                 Complement = Complement
             };
-
         }
 
         internal LocationDto Update(LocationOutDto location)
         {
             return new LocationDto
             {
-                Street = location.Street ?? Street,
-                City = location.City ?? City,
                 PostalCode = location.PostalCode ?? PostalCode,
-                Country = location.Country ?? Country,
+                Street = location.Street ?? Street,
+                Number = location.Number ?? Number,
+                Neiborhood = location.Neighborhood ?? Neighborhood,
+                City = location.City ?? City,
                 State = location.State ?? State,
+                Country = location.Country ?? Country,
                 Complement = location.Complement ?? Complement
             };
         }
