@@ -58,18 +58,21 @@ namespace SimpleAgenda.Context
         {
             // Configuring composite key for LocationDto
             modelBuilder.Entity<LocationDto>()
-                .HasKey(l => new { l.Street, l.Number, l.City, l.PostalCode, l.Country, l.State, l.Complement });
+                .HasIndex(l => new { l.Street, l.Number, l.City, l.PostalCode, l.Country, l.State, l.Complement })
+                .IsUnique(true);
 
             // Configuring relationships for AppointmentDto and EventDto as one-to-one
             modelBuilder.Entity<AppointmentDto>()
                 .HasOne(a => a.Event)
                 .WithOne()
+                .HasForeignKey<AppointmentDto>("Id")
                 .IsRequired();
 
             // Configuring relationship for EventDto and LocationDto as one-to-one, with LocationDto being optional
             modelBuilder.Entity<EventDto>()
                 .HasOne(e => e.Location)
                 .WithOne()
+                .HasForeignKey<EventDto>("LocationId")
                 .IsRequired(false);
         }
 

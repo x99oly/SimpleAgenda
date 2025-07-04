@@ -188,14 +188,14 @@ namespace SimpleAgendaTests.UnitTests.Entities.Appointment
                     Title = "Com Endereço Original",
                     Location = new LocationOutDto
                     {
+                        PostalCode = "11111-111",
                         Street = "Rua Atualizada",
                         Number = "200",
+                        Neighborhood = "Centro",
                         City = "Cidade Atualizada",
-                        PostalCode = "11111-111",
-                        Country = "Brasil",
-                        State = BrazilStatesEnum.SP
+                        State = BrazilStatesEnum.SP,
+                        Country = "Brasil"
                     }
-
                 }
             };
             int createdId = await _service.Create(newAppointment);
@@ -206,8 +206,13 @@ namespace SimpleAgendaTests.UnitTests.Entities.Appointment
                 {
                     Location = new LocationOutDto
                     {
+                        PostalCode = "11111-111",
                         Street = "Rua Atualizada",
-                        City = "Cidade Atualizada"
+                        Number = "200",
+                        Neighborhood = "Centro",
+                        City = "Cidade Atualizada",
+                        State = BrazilStatesEnum.SP,
+                        Country = "Brasil"
                     }
                 }
             };
@@ -236,14 +241,14 @@ namespace SimpleAgendaTests.UnitTests.Entities.Appointment
                     Description = "Descrição Original",
                     Location = new LocationOutDto
                     {
+                        PostalCode = "00000-000",
                         Street = "Rua A",
                         Number = "100",
+                        Neighborhood = "Bairro A",
                         City = "Cidade A",
-                        PostalCode = "00000-000",
-                        Country = "Brasil",
-                        State = BrazilStatesEnum.SP
+                        State = BrazilStatesEnum.SP,
+                        Country = "Brasil"
                     }
-
                 }
             };
             int createdId = await _service.Create(newAppointment);
@@ -257,8 +262,14 @@ namespace SimpleAgendaTests.UnitTests.Entities.Appointment
                     Description = "Nova Descrição",
                     Location = new LocationOutDto
                     {
+                        PostalCode = "99999-999",
                         Street = "Rua Nova",
-                        City = "Cidade Nova"
+                        Number = "101",
+                        Neighborhood = "Bairro Novo",
+                        City = "Cidade Nova",
+                        State = BrazilStatesEnum.RJ,
+                        Country = "Brasil",
+                        Complement = "Próximo à praça"
                     }
                 }
             };
