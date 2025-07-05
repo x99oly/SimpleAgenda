@@ -59,18 +59,18 @@ namespace SimpleAgenda.Repositories
             return await _dbSet.ToListAsync();
         }
 
-        public async Task<List<T>> GetList(QueryDto param)
+        public async Task<List<T>> GetList<TFilter>(QueryDto param)
+        where TFilter : IQueryFilter<T>
         {
-            // Grantee that the provided context is a DbContext implementation
             if (_context is not DbContext dbContext)
-                throw new InvalidOperationException("O IContext precisa herdar de DbContext para permitir queries avançadas.");
+                throw new InvalidOperationException("O IContext precisa herdar de DbContext.");
 
-            // Bring the Events and Location properties into the query - Otherwise, they will return null
-            IQueryable<AppointmentDto> query = dbContext.Set<AppointmentDto>()
-                .Include(a => a.Event)
-                .ThenInclude(e => e.Location)
-                .AsQueryable();
+            var query = dbContext.Set<T>().AsQueryable();
 
+            // Aqui usamos o método estático definido na interface
+            query = TFilter.ApplyFilter(query, param);
+
+            return await query.ToListAsync();
         }
 
         // Create new entity
@@ -101,8 +101,6 @@ namespace SimpleAgenda.Repositories
             }
         }
 
-
-        private void SetQueryParam(IQueryable<T> )
     
     }
 }

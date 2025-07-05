@@ -20,6 +20,6 @@ namespace SimpleAgenda.Interfaces
         /// conditions to be applied.</param>
         /// <returns>An <see cref="IQueryable{T}"/> representing the filtered data source. The returned queryable reflects the
         /// applied filter criteria.</returns>
-        IQueryable<T> ApplyFilter(QueryDto param);
+        static abstract IQueryable<T> ApplyFilter(IQueryable<T> query, QueryDto param);
     }
 }

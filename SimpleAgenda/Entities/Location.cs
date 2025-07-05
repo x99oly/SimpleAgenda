@@ -34,7 +34,7 @@ namespace SimpleAgenda.Entities
             PostalCode = PostalCodeValidator(dto.PostalCode);
             Street = dto.Street.NullOrEmptyValidator();
             Number = dto.Number.NullOrEmptyValidator();
-            Neighborhood = dto.Neiborhood.NullOrEmptyValidator();
+            Neighborhood = dto.Neighborhood.NullOrEmptyValidator();
             City = dto.City.NullOrEmptyValidator();
             Country = dto.Country.NullOrEmptyValidator();
             State = StateValidator(dto.State.ToString());
@@ -92,7 +92,7 @@ namespace SimpleAgenda.Entities
                 PostalCode = PostalCode,
                 Street = Street,
                 Number = Number,
-                Neiborhood = Neighborhood,
+                Neighborhood = Neighborhood,
                 City = City,
                 State = State,
                 Country = Country,
@@ -107,7 +107,7 @@ namespace SimpleAgenda.Entities
                 PostalCode = location.PostalCode ?? PostalCode,
                 Street = location.Street ?? Street,
                 Number = location.Number ?? Number,
-                Neiborhood = location.Neighborhood ?? Neighborhood,
+                Neighborhood = location.Neighborhood ?? Neighborhood,
                 City = location.City ?? City,
                 State = location.State ?? State,
                 Country = location.Country ?? Country,

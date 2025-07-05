@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using SimpleAgenda.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace SimpleAgenda.DTOS.Internals
 {
@@ -12,5 +13,7 @@ namespace SimpleAgenda.DTOS.Internals
 
         [Required]
         public EventDto Event { get; set; } = null!;
+
+        public StatusEnum Status { get; set; } = StatusEnum.PENDING;
     }
 }
