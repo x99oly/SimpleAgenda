@@ -3,6 +3,9 @@
  */
 using Microsoft.EntityFrameworkCore;
 using SimpleAgenda.Context;
+using SimpleAgenda.DTOS.Internals;
+using SimpleAgenda.DTOS.Publics;
+using SimpleAgenda.Entities;
 using SimpleAgenda.Interfaces;
 
 namespace SimpleAgenda.Repositories
@@ -54,6 +57,21 @@ namespace SimpleAgenda.Repositories
         public async Task<List<T>> GetList()
         {
             return await _dbSet.ToListAsync();
+        }
+
+        public async Task<List<T>> GetList(AppointmentOutDto param)
+        {
+            // Grantee that the provided context is a DbContext implementation
+            if (_context is not DbContext dbContext)
+                throw new InvalidOperationException("O IContext precisa herdar de DbContext para permitir queries avançadas.");
+
+            // Bring the Events and Location properties into the query - Otherwise, they will return null
+            var query = dbContext.Set<AppointmentDto>()
+                .Include(a => a.Event)
+                .ThenInclude(e => e.Location)
+                .AsQueryable();
+
+
         }
 
         // Create new entity

@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿/*
+ The following code has an implementation problem. It is using various intances of SqlLiteRepositoryTest to test the repository functionality while the test functions are running in parallel. This may cause the tests to not run all at once. 
+May the solution is to use a single instance of SqlLiteRepositoryTest and run the tests sequentially.
+*/
 using SimpleAgenda.Context;
 using SimpleAgenda.DTOS.Internals;
 using SimpleAgenda.DTOS.Publics;
