@@ -9,3 +9,4 @@ obj/
 *.vscode/ 
 TestResults/ 
 *.log 
+SimpleAgendaTest\UnitTest\Public/ 
