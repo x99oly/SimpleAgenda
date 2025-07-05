@@ -96,7 +96,7 @@ namespace SimpleAgenda.Services
             T? internalDto = ap.ConvertToPublicDto() as T 
                 ?? throw new InvalidCastException("The converted AppointmentOutDto is null or not of the expected type.");
             
-            await _repository.Update(internalDto as T);
+            await _repository.Update(ap.Id, internalDto as T);
         }
 
         public async Task Delete(int id)

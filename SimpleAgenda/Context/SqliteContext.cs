@@ -65,14 +65,14 @@ namespace SimpleAgenda.Context
             modelBuilder.Entity<AppointmentDto>()
                 .HasOne(a => a.Event)
                 .WithOne()
-                .HasForeignKey<AppointmentDto>("Id")
+                .HasForeignKey<AppointmentDto>("event_id")
                 .IsRequired();
 
             // Configuring relationship for EventDto and LocationDto as one-to-one, with LocationDto being optional
             modelBuilder.Entity<EventDto>()
                 .HasOne(e => e.Location)
                 .WithOne()
-                .HasForeignKey<EventDto>("LocationId")
+                .HasForeignKey<EventDto>("location_id")
                 .IsRequired(false);
         }
 

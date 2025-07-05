@@ -5,10 +5,13 @@ namespace SimpleAgenda.DTOS.Internals
     internal class EventDto
     {
         [Key]
-        internal int Id { get; set; }
+        public int Id { get; set; }
+
         [Required]
-        internal string Title { get; set; } = string.Empty;
-        internal string? Description { get; set; }
-        internal LocationDto? Location { get; set; }
+        public string Title { get; set; } = string.Empty;
+
+        public string? Description { get; set; }
+
+        public LocationDto? Location { get; set; }
     }
 }

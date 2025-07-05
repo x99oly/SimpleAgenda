@@ -63,11 +63,14 @@ namespace SimpleAgenda.Repositories
             await _context.SaveChangesAsync();
         }
 
-        // Update an existing entity
-        public async Task Update(T entity)
+        public async Task Update(int id, T entity)
         {
-            _dbSet.Update(entity);
-            await _context.SaveChangesAsync();
+            var existingEntity = await Get(id);
+            if (existingEntity != null)
+            {
+                _context.Entry(existingEntity).CurrentValues.SetValues(entity);
+                await _context.SaveChangesAsync();
+            }
         }
 
         // Delete entity by ID

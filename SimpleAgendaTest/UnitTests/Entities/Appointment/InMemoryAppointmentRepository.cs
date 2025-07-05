@@ -28,7 +28,7 @@ namespace SimpleAgendaTests.UnitTests.Entities.Appointment
             return Task.CompletedTask;
         }
 
-        public Task Update(T entity)
+        public Task Update(int id, T entity)
         {
             var index = _data.FindIndex(e => GetEntityId(e) == GetEntityId(entity));
             if (index >= 0)
