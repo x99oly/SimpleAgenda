@@ -12,12 +12,12 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace SimpleAgendaTests.UnitTests.Repositories
+namespace SimpleAgendaTest.UnitTests.Repositories
 {
     public class SqLiteRepositoryTest : IAsyncLifetime
     {
     
-        private string DbPath;
+        private string DbPath = string.Empty;
         
         public Task InitializeAsync()
         {
@@ -222,7 +222,7 @@ namespace SimpleAgendaTests.UnitTests.Repositories
             var appointments = await repo.GetList();
 
             Assert.NotNull(appointments);
-            Assert.Equal(1, appointments.Count);
+            Assert.Single(appointments);
             Assert.Equal(newAppointment1, appointments[0]);
 
         }
@@ -529,7 +529,7 @@ namespace SimpleAgendaTests.UnitTests.Repositories
 
             var filter = new QueryDto
             {
-                StatusIn = new List<StatusEnum> { StatusEnum.PENDING, StatusEnum.CONFIRMED }
+                StatusIn = [StatusEnum.PENDING, StatusEnum.CONFIRMED]
             };
 
             var results = await repo.GetList<Appointment>(filter);
@@ -709,8 +709,11 @@ namespace SimpleAgendaTests.UnitTests.Repositories
             var results = await repo.GetList<Appointment>(filter);
 
             Assert.NotNull(results);
+            Assert.NotNull(results[0]);
+            Assert.NotNull(results[0].Event);
+            Assert.NotNull(results[0].Event.Location);
+            Assert.Equal("CityX", results[0].Event.Location!.City);
             Assert.Single(results);
-            Assert.Equal("CityX", results[0].Event.Location.City);
         }
 
         [Fact]

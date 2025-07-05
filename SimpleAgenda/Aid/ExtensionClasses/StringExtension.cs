@@ -13,7 +13,7 @@ namespace SimpleAgenda.Aid.ExtensionClasses
         /// <exception cref="ArgumentException">
         /// Thrown when the provided string is null, empty, or consists only of white-space characters.
         /// </exception>
-        internal static string NullOrEmptyValidator(this string value)
+        internal static string NullOrEmptyValidator(this string? value)
         {
             return !String.IsNullOrWhiteSpace(value)
                 ? value

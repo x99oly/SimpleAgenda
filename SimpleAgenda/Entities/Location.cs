@@ -43,7 +43,7 @@ namespace SimpleAgenda.Entities
 
         public Location(LocationOutDto dto)
         {
-            PostalCode = PostalCodeValidator(dto.PostalCode);
+            PostalCode = PostalCodeValidator(dto.PostalCode!);
             Street = dto.Street.NullOrEmptyValidator();
             Number = dto.Number.NullOrEmptyValidator();
             Neighborhood = dto.Neighborhood.NullOrEmptyValidator();
@@ -53,15 +53,17 @@ namespace SimpleAgenda.Entities
             Complement = dto.Complement ?? string.Empty;
         }
 
-        private static string PostalCodeValidator(string value)
+        private static string PostalCodeValidator(string? value)
         {
-            if (value.Count(d => char.IsDigit(d)) < 8)
+            value?.NullOrEmptyValidator();
+
+            if (value!.Count(d => char.IsDigit(d)) < 8)
                 throw new ArgumentException("The provided value doesn't have the correct number of digits for a postal code.");
 
-            return value.NullOrEmptyValidator();
+            return value!.NullOrEmptyValidator();
         }
 
-        private static BrazilStatesEnum StateValidator(string value)
+        private static BrazilStatesEnum StateValidator(string? value)
         {
             value = value.NullOrEmptyValidator();
             if (!Enum.TryParse(value, out BrazilStatesEnum estado))
@@ -139,7 +141,9 @@ namespace SimpleAgenda.Entities
                 query = query.Where(a => a.Event.Location != null && a.Event.Location.Country.Contains(param.Country));
 
             if (!string.IsNullOrWhiteSpace(param.Complement))
-                query = query.Where(a => a.Event.Location != null && a.Event.Location.Complement.Contains(param.Complement));
+                query = query.Where(a => a.Event.Location != null 
+                && a.Event.Location.Complement != null 
+                && a.Event.Location.Complement.Contains(param.Complement));
 
             return query;
         }

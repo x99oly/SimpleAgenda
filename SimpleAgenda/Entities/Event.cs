@@ -30,7 +30,7 @@ namespace SimpleAgenda.Entities
         internal Event(EventOutDto dto)
         {
             id = dto.Id ?? Aid.AidClasses.AidIdentifier.RandomIntId(4);
-            Title = dto.Title ?? throw new ArgumentException(nameof(dto.Title),$"The event title must be provided.");
+            Title = dto.Title ?? throw new ArgumentException($"The event title must be provided.", nameof(dto));
             Description = dto.Description ?? string.Empty;
             Location = dto.Location != null ? new Location(dto.Location) : null;
         }
@@ -81,15 +81,15 @@ namespace SimpleAgenda.Entities
                 query = query.Where(a => a.Event.Title.Contains(param.EventTitle));
 
             if (!string.IsNullOrWhiteSpace(param.EventDescription))
-                query = query.Where(a => a.Event.Description.Contains(param.EventDescription));
+                query = query.Where(a => a.Event.Description != null && a.Event.Description.Contains(param.EventDescription));
 
             // Search term (in title/description)
             if (!string.IsNullOrWhiteSpace(param.SearchTerm))
             {
                 var term = param.SearchTerm.ToLower();
                 query = query.Where(a =>
-                    a.Event.Title.ToLower().Contains(term) ||
-                    a.Event.Description.ToLower().Contains(term));
+                    a.Event.Title.Contains(term, StringComparison.CurrentCultureIgnoreCase) ||
+                    a.Event.Description != null && a.Event.Description.Contains(term, StringComparison.CurrentCultureIgnoreCase));
             }
 
             // Delegar para Location
