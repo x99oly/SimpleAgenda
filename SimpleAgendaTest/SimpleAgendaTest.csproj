@@ -23,6 +23,7 @@
   <ItemGroup>
     <Folder Include="IntegrationTests\" />
     <Folder Include="UnitTests\Public\" />
+    <Folder Include="UnitTests\Repositories\Public\" />
   </ItemGroup>
 
   <ItemGroup>

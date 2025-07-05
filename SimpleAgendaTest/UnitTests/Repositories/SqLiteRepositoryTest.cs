@@ -8,248 +8,271 @@ using SimpleAgenda.DTOS.Publics;
 using SimpleAgenda.Entities;
 using SimpleAgenda.Enums;
 using SimpleAgenda.Repositories;
-using System.Formats.Asn1;
-
+using System;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace SimpleAgendaTests.UnitTests.Repositories
 {
-    public class SqLiteRepositoryTest 
+    public class SqLiteRepositoryTest : IAsyncLifetime
     {
     
-        private const string DbPath = @"only-create.db";
-           
-        public static void Arrange()
+        private string DbPath;
+        
+        public Task InitializeAsync()
         {
-            if (File.Exists(DbPath))
-                File.Delete(DbPath);
+            // Obtém o diretório onde o código está sendo executado
+            string currentDirectory = Directory.GetCurrentDirectory();
+
+            // Caminho para o diretório 'UnitTests' (um nível acima do diretório de execução)
+            string unitTestsDirectory = Path.GetFullPath(Path.Combine(currentDirectory, "..", "..", "..", "UnitTests"));
+
+            // Caminho completo para a pasta 'Public' dentro de 'UnitTests'
+            string publicDirectory = Path.Combine(unitTestsDirectory, "Public");
+
+            // Verifica se a pasta "public" já existe. Se não, cria.
+           
+            var files = Directory.GetFiles(publicDirectory);
+            foreach (var file in files)
+            {
+                try
+                {
+                    File.Delete(file); // Apaga o arquivo
+                    Console.WriteLine($"Arquivo {file} deletado.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Erro ao deletar o arquivo {file}: {ex.Message}");
+                }
+            }
+            
+
+            DbPath = publicDirectory;
+
+            return Task.CompletedTask;
         }
 
-        //[Fact]
-        //public async Task SaveNewAppointment()
-        //{
-        //    // Arrange
-        //    Arrange();
+        public Task DisposeAsync()
+        {
+            //Directory.Delete(DbPath, true); // Remove a pasta se já existir
+            return Task.CompletedTask;
+        }
 
-        //    var context = new SqliteContext($"Data Source={DbPath}");
-        //    var repo = new AgendaRepository<AppointmentDto>(context);
+        [Fact]
+        public async Task SaveNewAppointment()
+        {
+            string dbfile = "SaveNewAppointmentFuncion.db";
+            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
+            var repo = new AgendaRepository<AppointmentDto>(context);
 
-        //    var newAppointment = new AppointmentDto
-        //    {
-        //        Date = DateTime.Today.AddDays(2),
-        //        Event = new EventDto
-        //        {
-        //            Title = "Evento Público 3",
-        //            Description = "Evento criado para teste"
-        //        }
-        //    };
+            var newAppointment = new AppointmentDto
+            {
+                Date = DateTime.Today.AddDays(2),
+                Event = new EventDto
+                {
+                    Title = "Evento Público 3",
+                    Description = "Evento criado para teste"
+                }
+            };
 
-        //    // Act
-        //    await repo.Create(newAppointment);
+            // Act
+            await repo.Create(newAppointment);
 
-        //    // Assert
-        //    var lista = await repo.GetList();
-        //    Assert.Single(lista);
-        //    Assert.NotNull(lista[0].Event);
-        //}
+            // Assert
+            var lista = await repo.GetList();
+            Assert.Single(lista);
+            Assert.NotNull(lista[0].Event);
+        }
 
-        //[Fact]
-        //public async Task SaveNewEvent()
-        //{
-        //    Arrange();
+        [Fact]
+        public async Task SaveNewEvent()
+        {
+            string dbfile = "SaveNewEvent.db";
+            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
+            var repo = new AgendaRepository<EventDto>(context);
+            var newEvent = new EventDto
+            {
+                Title = "Evento Público 3",
+                Description = "Evento criado para teste"
+            };
+            // Act
+            await repo.Create(newEvent);
+            // Assert
+            var lista = await repo.GetList();
+            Assert.Single(lista);
+        }
 
-        //    var context = new SqliteContext($"Data Source={DbPath}");
-        //    var repo = new AgendaRepository<EventDto>(context);
-        //    var newEvent = new EventDto
-        //    {
-        //        Title = "Evento Público 3",
-        //        Description = "Evento criado para teste"
-        //    };
-        //    // Act
-        //    await repo.Create(newEvent);
-        //    // Assert
-        //    var lista = await repo.GetList();
-        //    Assert.Single(lista);
-        //}
+        [Fact]
+        public async Task SaveNewLocation()
+        {
+            string dbfile = "SaveNewLocation.db";
+            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
+            var repo = new AgendaRepository<LocationDto>(context);
+            var newLocation = new LocationDto
+            {
+                Street = "Rua Teste",
+                Number = "123",
+                City = "Cidade Teste",
+                PostalCode = "12345-678",
+                Country = "País Teste",
+                State = BrazilStatesEnum.MG,
+                Complement = "Complemento Teste"
+            };
+            // Act
+            await repo.Create(newLocation);
+            // Assert
+            var lista = await repo.GetList();
+            Assert.Single(lista);
+        }
 
-        //[Fact]
-        //public async Task SaveNewLocation()
-        //{
-        //    // Arrange
-        //    if (File.Exists(DbPath))
-        //        File.Delete(DbPath);
-        //    var context = new SqliteContext($"Data Source={DbPath}");
-        //    var repo = new AgendaRepository<LocationDto>(context);
-        //    var newLocation = new LocationDto
-        //    {
-        //        Street = "Rua Teste",
-        //        Number = "123",
-        //        City = "Cidade Teste",
-        //        PostalCode = "12345-678",
-        //        Country = "País Teste",
-        //        State = BrazilStatesEnum.MG,
-        //        Complement = "Complemento Teste"
-        //    };
-        //    // Act
-        //    await repo.Create(newLocation);
-        //    // Assert
-        //    var lista = await repo.GetList();
-        //    Assert.Single(lista);
-        //}
+        [Fact]
+        public async Task GetAppointment()
+        {
+            string dbfile = "GetAppointment.db";
+            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
+            var repo = new AgendaRepository<AppointmentDto>(context);
 
-        //[Fact]
-        //public async Task GetAppointment()
-        //{
-        //    Arrange();
+            var newAppointment = new AppointmentDto
+            {
+                Date = DateTime.Today.AddDays(2),
+                Event = new EventDto
+                {
+                    Title = "Evento Público 3",
+                    Description = "Evento criado para teste"
+                }
+            };
 
-        //    var context = new SqliteContext($"Data Source={DbPath}");
-        //    var repo = new AgendaRepository<AppointmentDto>(context);
+            await repo.Create(newAppointment);
 
-        //    var newAppointment = new AppointmentDto
-        //    {
-        //        Date = DateTime.Today.AddDays(2),
-        //        Event = new EventDto
-        //        {
-        //            Title = "Evento Público 3",
-        //            Description = "Evento criado para teste"
-        //        }
-        //    };
+            var appointment = await repo.Get(newAppointment.Id);
 
-        //    await repo.Create(newAppointment);
+            Assert.NotNull(appointment);
 
-        //    var appointment = await repo.Get(newAppointment.Id);
+        }
 
-        //    Assert.NotNull(appointment);
+        [Fact]
+        public async Task GetAllAppointments()
+        {
+            string dbfile = "GetAllAppointments.db";
+            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
+            var repo = new AgendaRepository<AppointmentDto>(context);
 
-        //}
+            var newAppointment0 = new AppointmentDto
+            {
+                Date = DateTime.Today.AddDays(2),
+                Event = new EventDto
+                {
+                    Title = "Evento Público 3",
+                    Description = "Evento criado para teste"
+                }
+            };
 
-        //[Fact]
-        //public async Task GetAllAppointments()
-        //{
-        //    Arrange();
+            var newAppointment1 = new AppointmentDto
+            {
+                Date = DateTime.Today.AddDays(2),
+                Event = new EventDto
+                {
+                    Title = "Evento Público 3",
+                    Description = "Evento criado para teste"
+                }
+            };
 
-        //    var context = new SqliteContext($"Data Source={DbPath}");
-        //    var repo = new AgendaRepository<AppointmentDto>(context);
+            await repo.Create(newAppointment1);
+            await repo.Create(newAppointment0);
 
-        //    var newAppointment0 = new AppointmentDto
-        //    {
-        //        Date = DateTime.Today.AddDays(2),
-        //        Event = new EventDto
-        //        {
-        //            Title = "Evento Público 3",
-        //            Description = "Evento criado para teste"
-        //        }
-        //    };
+            var appointments = await repo.GetList();
 
-        //    var newAppointment1 = new AppointmentDto
-        //    {
-        //        Date = DateTime.Today.AddDays(2),
-        //        Event = new EventDto
-        //        {
-        //            Title = "Evento Público 3",
-        //            Description = "Evento criado para teste"
-        //        }
-        //    };
+            Assert.NotNull(appointments);
+            Assert.Equal(2, appointments.Count);
 
-        //    await repo.Create(newAppointment1);
-        //    await repo.Create(newAppointment0);
+        }
 
-        //    var appointments = await repo.GetList();
+        [Fact]
+        public async Task DeleteAppointment()
+        {
+            string dbfile = "SaveNewAppointment.db";
+            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
+            var repo = new AgendaRepository<AppointmentDto>(context);
 
-        //    Assert.NotNull(appointments);
-        //    Assert.Equal(2,appointments.Count);
+            var newAppointment0 = new AppointmentDto
+            {
+                Date = DateTime.Today.AddDays(2),
+                Event = new EventDto
+                {
+                    Title = "Evento Público 3",
+                    Description = "Evento criado para teste"
+                }
+            };
 
-        //}
+            var newAppointment1 = new AppointmentDto
+            {
+                Date = DateTime.Today.AddDays(2),
+                Event = new EventDto
+                {
+                    Title = "Evento Público 3",
+                    Description = "Evento criado para teste"
+                }
+            };
 
-        //[Fact]
-        //public async Task DeleteAppointment()
-        //{
-        //    Arrange();
+            await repo.Create(newAppointment1);
+            await repo.Create(newAppointment0);
 
-        //    var context = new SqliteContext($"Data Source={DbPath}");
-        //    var repo = new AgendaRepository<AppointmentDto>(context);
+            await repo.Delete(newAppointment0.Id);
 
-        //    var newAppointment0 = new AppointmentDto
-        //    {
-        //        Date = DateTime.Today.AddDays(2),
-        //        Event = new EventDto
-        //        {
-        //            Title = "Evento Público 3",
-        //            Description = "Evento criado para teste"
-        //        }
-        //    };
+            var appointments = await repo.GetList();
 
-        //    var newAppointment1 = new AppointmentDto
-        //    {
-        //        Date = DateTime.Today.AddDays(2),
-        //        Event = new EventDto
-        //        {
-        //            Title = "Evento Público 3",
-        //            Description = "Evento criado para teste"
-        //        }
-        //    };
+            Assert.NotNull(appointments);
+            Assert.Equal(1, appointments.Count);
+            Assert.Equal(newAppointment1, appointments[0]);
 
-        //    await repo.Create(newAppointment1);
-        //    await repo.Create(newAppointment0);
+        }
 
-        //    await repo.Delete(newAppointment0.Id);
+        [Fact]
+        public async Task UpdateAppointment()
+        {
+            string dbfile = "UpdateAppointment.db";
+            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
+            var repo = new AgendaRepository<AppointmentDto>(context);
 
-        //    var appointments = await repo.GetList();
+            DateTime updatedDate = DateTime.Today.AddDays(2);
 
-        //    Assert.NotNull(appointments);
-        //    Assert.Equal(1, appointments.Count);
-        //    Assert.Equal(newAppointment1, appointments[0]);
+            var newAppointment = new AppointmentDto
+            {
+                Date = DateTime.Today,
+                Event = new EventDto
+                {
+                    Title = "Evento Público 3",
+                    Description = "Evento criado para teste"
+                }
+            };
+            await repo.Create(newAppointment);
 
-        //}
+            // Internal lógic to updating appointment
+            Appointment appointment = new(newAppointment);
 
-        //[Fact]
-        //public async Task UpdateAppointment()
-        //{
-        //    Arrange();
+            var updatedAppointment = new AppointmentOutDto
+            {
+                Date = updatedDate
+            };
+            appointment.Update(updatedAppointment);
 
-        //    var context = new SqliteContext($"Data Source={DbPath}");
-        //    var repo = new AgendaRepository<AppointmentDto>(context);
+            // Persist the updated appointment back to the repository
+            await repo.Update(appointment.Id, appointment.ConvertToInternalDto());
 
-        //    DateTime updatedDate = DateTime.Today.AddDays(2);
+            // Retrieve the updated appointment from the repository to validate
+            var toValidateAppointment = await repo.Get(appointment.Id);
 
-        //    var newAppointment = new AppointmentDto
-        //    {
-        //        Date = DateTime.Today,
-        //        Event = new EventDto
-        //        {
-        //            Title = "Evento Público 3",
-        //            Description = "Evento criado para teste"
-        //        }
-        //    };
-        //    await repo.Create(newAppointment);
-
-        //    // Internal lógic to updating appointment
-        //    Appointment appointment = new(newAppointment);
-
-        //    var updatedAppointment = new AppointmentOutDto
-        //    {
-        //        Date = updatedDate
-        //    };
-        //    appointment.Update(updatedAppointment);
-
-        //    // Persist the updated appointment back to the repository
-        //    await repo.Update(appointment.Id, appointment.ConvertToInternalDto());
-
-        //    // Retrieve the updated appointment from the repository to validate
-        //    var toValidateAppointment = await repo.Get(appointment.Id);
-
-        //    // Perform assertions to confirm the update
-        //    Assert.NotNull(toValidateAppointment);
-        //    Assert.Equal(appointment.Id, toValidateAppointment.Id);
-        //    Assert.Equal(updatedDate, toValidateAppointment.Date);
-        //}
+            // Perform assertions to confirm the update
+            Assert.NotNull(toValidateAppointment);
+            Assert.Equal(appointment.Id, toValidateAppointment.Id);
+            Assert.Equal(updatedDate, toValidateAppointment.Date);
+        }
 
         [Fact]
         public async Task GetListWithFilteringDate()
         {
-            // Arrange
-            Arrange();
-
-            var context = new SqliteContext($"Data Source={DbPath}");
+            string dbfile = "GetListWithFilteringDate.db";
+            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
             var repo = new AgendaRepository<AppointmentDto>(context);
 
             var newAppointment0 = new AppointmentDto
@@ -299,15 +322,14 @@ namespace SimpleAgendaTests.UnitTests.Repositories
             Assert.NotNull(results);
             Assert.Single(results); // apenas newAppointment1 deve estar no range
             Assert.Equal("Evento Público 2", results[0].Event.Title);
+
         }
 
         [Fact]
         public async Task GetListWithFilteringByAppointmentId()
         {
-            // Arrange
-            Arrange();
-
-            var context = new SqliteContext($"Data Source={DbPath}");
+            string dbfile = "GetListWithFilteringByAppointmentId.db";
+            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
             var repo = new AgendaRepository<AppointmentDto>(context);
 
             var appointment0 = new AppointmentDto
@@ -358,10 +380,8 @@ namespace SimpleAgendaTests.UnitTests.Repositories
         [Fact]
         public async Task GetListWithFilteringDateRange()
         {
-            // Arrange
-            Arrange();
-
-            var context = new SqliteContext($"Data Source={DbPath}");
+            string dbfile = "GetListWithFilteringDateRange.db";
+            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
             var repo = new AgendaRepository<AppointmentDto>(context);
 
             var appointment0 = new AppointmentDto
@@ -435,9 +455,8 @@ namespace SimpleAgendaTests.UnitTests.Repositories
         [Fact]
         public async Task GetListWithFilteringByStatus()
         {
-            Arrange();
-
-            var context = new SqliteContext($"Data Source={DbPath}");
+            string dbfile = "GetListWithFilteringByStatus.db";
+            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
             var repo = new AgendaRepository<AppointmentDto>(context);
 
             var appointment0 = new AppointmentDto
@@ -476,9 +495,8 @@ namespace SimpleAgendaTests.UnitTests.Repositories
         [Fact]
         public async Task GetListWithFilteringByStatusIn()
         {
-            Arrange();
-
-            var context = new SqliteContext($"Data Source={DbPath}");
+            string dbfile = "GetListWithFilteringByStatusIn.db";
+            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
             var repo = new AgendaRepository<AppointmentDto>(context);
 
             var appointment0 = new AppointmentDto
@@ -524,9 +542,8 @@ namespace SimpleAgendaTests.UnitTests.Repositories
         [Fact]
         public async Task GetListWithIncludeCancelledFalseFiltersOutCancelled()
         {
-            Arrange();
-
-            var context = new SqliteContext($"Data Source={DbPath}");
+            string dbfile = "GetListWithIncludeCancelledFalseFiltersOutCancelled.db";
+            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
             var repo = new AgendaRepository<AppointmentDto>(context);
 
             var appointment0 = new AppointmentDto
@@ -563,9 +580,8 @@ namespace SimpleAgendaTests.UnitTests.Repositories
         [Fact]
         public async Task GetListWithFilteringByEventTitle()
         {
-            Arrange();
-
-            var context = new SqliteContext($"Data Source={DbPath}");
+            string dbfile = "GetListWithFilteringByEventTitle.db";
+            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
             var repo = new AgendaRepository<AppointmentDto>(context);
 
             var appointment0 = new AppointmentDto
@@ -600,9 +616,8 @@ namespace SimpleAgendaTests.UnitTests.Repositories
         [Fact]
         public async Task GetListWithFilteringByEventDescription()
         {
-            Arrange();
-
-            var context = new SqliteContext($"Data Source={DbPath}");
+            string dbfile = "GetListWithFilteringByEventDescription.db";
+            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
             var repo = new AgendaRepository<AppointmentDto>(context);
 
             var appointment0 = new AppointmentDto
@@ -637,9 +652,8 @@ namespace SimpleAgendaTests.UnitTests.Repositories
         [Fact]
         public async Task GetListWithFilteringByLocationCity()
         {
-            Arrange();
-
-            var context = new SqliteContext($"Data Source={DbPath}");
+            string dbfile = "GetListWithFilteringByLocationCity.db";
+            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
             var repo = new AgendaRepository<AppointmentDto>(context);
 
             var appointment0 = new AppointmentDto
@@ -702,9 +716,8 @@ namespace SimpleAgendaTests.UnitTests.Repositories
         [Fact]
         public async Task GetListWithFilteringBySearchTerm()
         {
-            Arrange();
-
-            var context = new SqliteContext($"Data Source={DbPath}");
+            string dbfile = "GetListWithFilteringBySearchTerm.db";
+            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
             var repo = new AgendaRepository<AppointmentDto>(context);
 
             var appointment0 = new AppointmentDto
@@ -749,9 +762,8 @@ namespace SimpleAgendaTests.UnitTests.Repositories
         [Fact]
         public async Task GetListWithPagination()
         {
-            Arrange();
-
-            var context = new SqliteContext($"Data Source={DbPath}");
+            string dbfile = "GetListWithPagination.db";
+            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
             var repo = new AgendaRepository<AppointmentDto>(context);
 
             for (int i = 1; i <= 5; i++)
@@ -784,7 +796,6 @@ namespace SimpleAgendaTests.UnitTests.Repositories
             Assert.Equal(2, results[0].Id);  // Skip 1 (Id=1), next is Id=2
             Assert.Equal(3, results[1].Id);
         }
-
 
     }
 }
