@@ -59,18 +59,17 @@ namespace SimpleAgenda.Repositories
             return await _dbSet.ToListAsync();
         }
 
-        public async Task<List<T>> GetList(AppointmentOutDto param)
+        public async Task<List<T>> GetList(QueryDto param)
         {
             // Grantee that the provided context is a DbContext implementation
             if (_context is not DbContext dbContext)
                 throw new InvalidOperationException("O IContext precisa herdar de DbContext para permitir queries avançadas.");
 
             // Bring the Events and Location properties into the query - Otherwise, they will return null
-            var query = dbContext.Set<AppointmentDto>()
+            IQueryable<AppointmentDto> query = dbContext.Set<AppointmentDto>()
                 .Include(a => a.Event)
                 .ThenInclude(e => e.Location)
                 .AsQueryable();
-
 
         }
 
@@ -102,5 +101,8 @@ namespace SimpleAgenda.Repositories
             }
         }
 
+
+        private void SetQueryParam(IQueryable<T> )
+    
     }
 }
