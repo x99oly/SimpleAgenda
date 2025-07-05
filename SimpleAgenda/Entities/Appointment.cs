@@ -17,8 +17,8 @@ namespace SimpleAgenda.Entities
         internal readonly int Id;
         internal StatusEnum Status { get; private set; } = StatusEnum.PENDING;
         internal DateTime Date { get; private set; }
-        internal Event Event {  get; private set; }
-        
+        internal Event Event { get; private set; }
+
 
         public Type ElementType => throw new NotImplementedException();
 
@@ -28,7 +28,7 @@ namespace SimpleAgenda.Entities
         {
             Id = Aid.AidClasses.AidIdentifier.RandomIntId(4);
             Date = DateValidador(date);
-            Event = newEvent; 
+            Event = newEvent;
         }
 
         internal Appointment(DateTime date, string title, string? description = null, Location? location = null)
@@ -86,7 +86,7 @@ namespace SimpleAgenda.Entities
 
 
         // Validation method to ensure the appointment is valid
-        
+
         private static DateTime DateValidador(DateTime? date)
         {
             if (date is null)
@@ -96,6 +96,7 @@ namespace SimpleAgenda.Entities
 
             return date.Value;
         }
+
 
         public static IQueryable<AppointmentDto> ApplyFilter(IQueryable<AppointmentDto> query, QueryDto param)
         {
@@ -113,42 +114,6 @@ namespace SimpleAgenda.Entities
             else if (param.DateEnd.HasValue)
                 query = query.Where(a => a.Date <= param.DateEnd.Value);
 
-            // Event filters
-            if (param.EventId.HasValue)
-                query = query.Where(a => a.Event.Id == param.EventId.Value);
-
-            if (!string.IsNullOrWhiteSpace(param.EventTitle))
-                query = query.Where(a => a.Event.Title.Contains(param.EventTitle));
-
-            if (!string.IsNullOrWhiteSpace(param.EventDescription))
-                query = query.Where(a => a.Event.Description.Contains(param.EventDescription));
-
-            // Location filters (only if Location is not null)
-            
-            if (!string.IsNullOrWhiteSpace(param.PostalCode))
-                query = query.Where(a => a.Event.Location != null && a.Event.Location.PostalCode.Contains(param.PostalCode));
-            
-            if (!string.IsNullOrWhiteSpace(param.Street))
-                query = query.Where(a => a.Event.Location != null && a.Event.Location.Street.Contains(param.Street));
-
-            if (!string.IsNullOrWhiteSpace(param.Number))
-                query = query.Where(a => a.Event.Location != null && a.Event.Location.Number.Contains(param.Number));
-
-            if (!string.IsNullOrWhiteSpace(param.Neighborhood))
-                query = query.Where(a => a.Event.Location != null && a.Event.Location.Neighborhood.Contains(param.Neighborhood));
-
-            if (!string.IsNullOrWhiteSpace(param.City))
-                query = query.Where(a => a.Event.Location != null && a.Event.Location.City.Contains(param.City));
-
-            if (param.State.HasValue)
-                query = query.Where(a => a.Event.Location != null && a.Event.Location.State == param.State);
-
-            if (!string.IsNullOrWhiteSpace(param.Country))
-                query = query.Where(a => a.Event.Location != null && a.Event.Location.Country.Contains(param.Country));
-
-            if (!string.IsNullOrWhiteSpace(param.Complement))
-                query = query.Where(a => a.Event.Location != null && a.Event.Location.Complement.Contains(param.Complement));
-
             // Status filters
             if (param.Status.HasValue)
                 query = query.Where(a => a.Status == param.Status);
@@ -159,14 +124,8 @@ namespace SimpleAgenda.Entities
             if (param.IncludeCancelled.HasValue && !param.IncludeCancelled.Value)
                 query = query.Where(a => a.Status != StatusEnum.CANCELLED);
 
-            // Search term (in title/description)
-            if (!string.IsNullOrWhiteSpace(param.SearchTerm))
-            {
-                var term = param.SearchTerm.ToLower();
-                query = query.Where(a =>
-                    a.Event.Title.ToLower().Contains(term) ||
-                    a.Event.Description.ToLower().Contains(term));
-            }
+            // Delegar para o filtro de Event            
+            query = Event.ApplyFilter(query, param);
 
             // Ordering
             if (!string.IsNullOrWhiteSpace(param.OrderBy))
@@ -181,11 +140,11 @@ namespace SimpleAgenda.Entities
                 else if (order == "Event.Description")
                     query = query.OrderBy(a => a.Event.Description);
                 else
-                    query = query.OrderBy(a => a.Id); // default
+                    query = query.OrderBy(a => a.Id);
             }
             else
             {
-                query = query.OrderBy(a => a.Id); // default if no ordering provided
+                query = query.OrderBy(a => a.Id);
             }
 
             // Pagination
@@ -197,6 +156,7 @@ namespace SimpleAgenda.Entities
 
             return query;
         }
-
     }
+
+
 }

@@ -4,7 +4,7 @@ using SimpleAgenda.Interfaces;
 
 namespace SimpleAgenda.Entities
 {
-    internal class Event : IDtoConvertable<EventDto>, IPublicDtoConvertable<EventOutDto>
+    internal class Event : IDtoConvertable<EventDto>, IPublicDtoConvertable<EventOutDto>, IQueryFilter<AppointmentDto>
     {
         internal readonly int id;
         internal string Title { get; set; }
@@ -70,6 +70,30 @@ namespace SimpleAgenda.Entities
                     : this.Location?.ConvertToInternalDto()
                 }
             );
+        }
+
+        public static IQueryable<AppointmentDto> ApplyFilter(IQueryable<AppointmentDto> query, QueryDto param)
+        {
+            if (param.EventId.HasValue)
+                query = query.Where(a => a.Event.Id == param.EventId.Value);
+
+            if (!string.IsNullOrWhiteSpace(param.EventTitle))
+                query = query.Where(a => a.Event.Title.Contains(param.EventTitle));
+
+            if (!string.IsNullOrWhiteSpace(param.EventDescription))
+                query = query.Where(a => a.Event.Description.Contains(param.EventDescription));
+
+            // Search term (in title/description)
+            if (!string.IsNullOrWhiteSpace(param.SearchTerm))
+            {
+                var term = param.SearchTerm.ToLower();
+                query = query.Where(a =>
+                    a.Event.Title.ToLower().Contains(term) ||
+                    a.Event.Description.ToLower().Contains(term));
+            }
+
+            // Delegar para Location
+            return Location.ApplyFilter(query, param);
         }
     }
 }

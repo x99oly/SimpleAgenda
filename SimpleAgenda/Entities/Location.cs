@@ -6,7 +6,7 @@ using SimpleAgenda.Interfaces;
 
 namespace SimpleAgenda.Entities
 {
-    internal class Location : IDtoConvertable<LocationDto>, IPublicDtoConvertable<LocationOutDto>
+    internal class Location : IDtoConvertable<LocationDto>, IPublicDtoConvertable<LocationOutDto>, IQueryFilter<AppointmentDto>
     {
         internal string PostalCode { get; private set; }
         internal string Street { get; private set; }
@@ -114,5 +114,35 @@ namespace SimpleAgenda.Entities
                 Complement = location.Complement ?? Complement
             };
         }
+
+        public static IQueryable<AppointmentDto> ApplyFilter(IQueryable<AppointmentDto> query, QueryDto param)
+        {
+            if (!string.IsNullOrWhiteSpace(param.PostalCode))
+                query = query.Where(a => a.Event.Location != null && a.Event.Location.PostalCode.Contains(param.PostalCode));
+
+            if (!string.IsNullOrWhiteSpace(param.Street))
+                query = query.Where(a => a.Event.Location != null && a.Event.Location.Street.Contains(param.Street));
+
+            if (!string.IsNullOrWhiteSpace(param.Number))
+                query = query.Where(a => a.Event.Location != null && a.Event.Location.Number.Contains(param.Number));
+
+            if (!string.IsNullOrWhiteSpace(param.Neighborhood))
+                query = query.Where(a => a.Event.Location != null && a.Event.Location.Neighborhood.Contains(param.Neighborhood));
+
+            if (!string.IsNullOrWhiteSpace(param.City))
+                query = query.Where(a => a.Event.Location != null && a.Event.Location.City.Contains(param.City));
+
+            if (param.State.HasValue)
+                query = query.Where(a => a.Event.Location != null && a.Event.Location.State == param.State);
+
+            if (!string.IsNullOrWhiteSpace(param.Country))
+                query = query.Where(a => a.Event.Location != null && a.Event.Location.Country.Contains(param.Country));
+
+            if (!string.IsNullOrWhiteSpace(param.Complement))
+                query = query.Where(a => a.Event.Location != null && a.Event.Location.Complement.Contains(param.Complement));
+
+            return query;
+        }
+
     }
 }
