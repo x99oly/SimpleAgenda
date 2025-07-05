@@ -10,3 +10,4 @@ obj/
 TestResults/ 
 *.log 
 SimpleAgendaTest\UnitTest\Public/ 
+SimpleAgendaTest/UnitTests/Public/ 
