@@ -65,8 +65,8 @@ namespace SimpleAgenda.Entities
                     Id = this.id,
                     Title = @event.Title ?? Title,
                     Description = @event.Description ?? Description,
-                    Location = @event.Location != null 
-                    ? Location?.Update(@event.Location) 
+                    Location = @event.Location != null
+                    ? Location?.Update(@event.Location)
                     : this.Location?.ConvertToInternalDto()
                 }
             );
@@ -88,8 +88,8 @@ namespace SimpleAgenda.Entities
             {
                 var term = param.SearchTerm.ToLower();
                 query = query.Where(a =>
-                    a.Event.Title.Contains(term, StringComparison.CurrentCultureIgnoreCase) ||
-                    a.Event.Description != null && a.Event.Description.Contains(term, StringComparison.CurrentCultureIgnoreCase));
+                    (a.Event.Title != null && a.Event.Title.ToLower().Contains(term)) ||
+                    (a.Event.Description != null && a.Event.Description.ToLower().Contains(term)));
             }
 
             // Delegar para Location
