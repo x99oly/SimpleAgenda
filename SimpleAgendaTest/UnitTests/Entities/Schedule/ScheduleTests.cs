@@ -27,7 +27,6 @@ namespace SimpleAgendaTest.UnitTests.Entities.Schedule
             var schedule = new SimpleAgenda.Entities.Schedule(now.AddMinutes(1), 8, 0);
 
             // Assert
-            var expectedEnd = now.AddYears(100);
             Assert.True(schedule.StartAndEndRangeDates.EndDate > now.AddYears(99));
         }
 

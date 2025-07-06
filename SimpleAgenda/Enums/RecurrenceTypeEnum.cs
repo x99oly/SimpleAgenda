@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SimpleAgenda.Enums
 {
-    internal enum RecurrenceTypeEnum
+    public enum RecurrenceTypeEnum
     {
         DAILY,
         WEEKLY,

@@ -73,7 +73,7 @@ namespace SimpleAgendaTest.UnitTests.Services
             {
                 countB++;
                 tcsB.TrySetResult();
-            }, new object[] { "Hello World" });
+            }, ["Hello World"]);
 
             // Assert
             await Task.WhenAll(tcsA.Task, tcsB.Task);

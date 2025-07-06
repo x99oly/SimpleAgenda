@@ -30,6 +30,7 @@ namespace SimpleAgenda.Context
             _connectionString = connectionString?.NullOrEmptyValidator() ?? _defaultConnectionString ;
         }
 
+        public DbSet<ScheduleDto> Schedules { get; set; }  // DbSet para ScheduleDto
         public DbSet<EventDto> Events { get; set; }  // DbSet para EventDto
         public DbSet<AppointmentDto> Appointments { get; set; }  // DbSet para AppointmentDto
         public DbSet<LocationDto> Locations { get; set; }  // DbSet para LocationDto
@@ -61,19 +62,32 @@ namespace SimpleAgenda.Context
                 .HasIndex(l => new { l.Street, l.Number, l.City, l.PostalCode, l.Country, l.State, l.Complement })
                 .IsUnique(true);
 
-            // Configuring relationships for AppointmentDto and EventDto as one-to-one
-            modelBuilder.Entity<AppointmentDto>()
-                .HasOne(a => a.Event)
-                .WithOne()
-                .HasForeignKey<AppointmentDto>("event_id")
-                .IsRequired();
-
             // Configuring relationship for EventDto and LocationDto as one-to-one, with LocationDto being optional
             modelBuilder.Entity<EventDto>()
                 .HasOne(e => e.Location)
                 .WithOne()
                 .HasForeignKey<EventDto>("location_id")
                 .IsRequired(false);
+
+            // Relation 1:1 between AppointmentDto and EventDto
+            modelBuilder.Entity<AppointmentDto>()
+                .HasOne(a => a.Event)
+                .WithOne()
+                .HasForeignKey<AppointmentDto>("event_id")
+                .IsRequired(true);
+
+            // Relation 1:1 between AppointmentDto and ScheduleDto
+            modelBuilder.Entity<AppointmentDto>()
+                .HasOne< ScheduleDto>()
+                .WithMany()
+                .HasForeignKey("schedule_id")
+                .IsRequired(true);
+
+            // Configuring ScheduleDto
+            modelBuilder.Entity<ScheduleDto>()
+                .HasMany(s => s.PendingAppointments)
+                .WithOne();
+
         }
 
     }
