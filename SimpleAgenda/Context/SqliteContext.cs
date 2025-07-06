@@ -78,8 +78,8 @@ namespace SimpleAgenda.Context
 
             // Relation 1:1 between AppointmentDto and ScheduleDto
             modelBuilder.Entity<AppointmentDto>()
-                .HasOne< ScheduleDto>()
-                .WithMany()
+                .HasOne<ScheduleDto>()
+                .WithOne()
                 .HasForeignKey("schedule_id")
                 .IsRequired(true);
 
