@@ -1,5 +1,37 @@
 # 🗓️ SimpleAgenda – Project Overview
 
+# Resumo Conceitual do Schedule
+
+## O que é o Schedule?
+- Entidade que define **padrões de recorrência** para agendamento de compromissos (Appointments).
+- Não armazena compromissos diretamente, apenas regras para gerar esses compromissos sob demanda.
+
+## O que o Schedule deve fazer?
+- Definir o período de validade da recorrência (`StartDate` e `EndDate`).
+- Controlar a frequência da recorrência (tipo e intervalo, ex: todo dia, toda semana, a cada 2 meses).
+- Definir quais dias da semana geram eventos no caso de recorrência semanal.
+- Determinar o horário da ocorrência no dia (via `TimeOfDay` / `HourMinute`).
+- Permitir controle de exclusões (datas específicas que não geram evento mesmo que se enquadrem na regra).
+- Permitir sobrescrever ocorrências específicas criando um novo schedule com `RepeatCount=1` e exclusão da data original.
+- Trabalhar com limite de repetições (via `RepeatCount`) e/ou limite de data final.
+
+## Prioridades definidas
+- Ter estrutura clara e validada para as regras da recorrência (validação de datas, intervalos, horários).
+- Implementar entidade Schedule que encapsule todas essas regras para facilitar o uso.
+- Ter serviço para gerar Appointments baseado no Schedule (planejado para fase seguinte).
+- Integrar Schedule com sistema de agendamento automático (Quartz.NET), permitindo passar uma ação (delegate) para execução no momento agendado.
+- Garantir persistência coerente (DTO + banco) que reflita o modelo de domínio com mapeamentos corretos.
+
+## Pontos para evoluir depois
+- Serviço de geração sob demanda de Appointments com base no Schedule.
+- Gestão avançada de exceções e overrides.
+- Suporte a triggers mais complexos além do StartDate + TimeOfDay.
+- Funcionalidades adicionais para o cron job (múltiplos tipos de trigger, regras complexas de repetição).
+
+---
+Esse é o guia para basear decisões técnicas e requisitos futuros.
+---
+
 ## ✅ Features Implemented
 
 ### 🧱 1. Schedule Entity
