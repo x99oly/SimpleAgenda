@@ -91,7 +91,7 @@ namespace SimpleAgenda.Entities
             StartAndEndRangeDates = new(startDate, endDate ?? DateTime.UtcNow.AddYears(100));
             RecurrenceType = recurrenceType;
             RecurrenceTime = new HourMinute(hour, minutes);
-            RecurrenceWeekDays = [..daysOfWeek!];
+            RecurrenceWeekDays = daysOfWeek is not null ? [..daysOfWeek!] : [];
 
             RecurrenceInterval = recurrenceInterval > 0
                 ? recurrenceInterval :
