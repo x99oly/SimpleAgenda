@@ -50,7 +50,7 @@ namespace SimpleAgenda.Services.Cron
             JobHandlers[scheduleId] = wrapped;
 
             var runDateTime = schedule.StartAndEndRangeDates.StartDate.Date
-                + schedule.RecurrenceTime.AsTimeSpan();
+                + schedule.Recurrence.RecurrenceTime.AsTimeSpan();
 
             var job = JobBuilder.Create<ScheduleQuartzJob>()
                 .WithIdentity(scheduleId)
@@ -63,6 +63,19 @@ namespace SimpleAgenda.Services.Cron
 
             await _scheduler.ScheduleJob(job, trigger);
         }
+
+        /// <summary>
+        /// Cancel the scheduled job and then remove it from handlers.
+        /// </summary>
+        public async Task CancelScheduleAsync(string scheduleId)
+        {
+            await _scheduler.DeleteJob(new JobKey(scheduleId));
+
+            if (JobHandlers.TryRemove(scheduleId, out var _))
+                await Task.CompletedTask;
+                        
+        }
+
 
     }
 

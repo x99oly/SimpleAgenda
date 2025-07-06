@@ -1,19 +1,21 @@
 ﻿using SimpleAgenda.Entities;
 using SimpleAgenda.Enums;
+using SimpleAgenda.Exceptions;
 
 namespace SimpleAgendaTest.UnitTests.Entities.Schedule
 {
     public class ScheduleTests
     {
         [Fact]
-        public void Should_ThrowException_When_StartDateIsInThePast()
+        public void Should_ThrowDomainException_When_StartDateIsInThePast()
         {
             // Arrange
             var pastDate = DateTime.UtcNow.AddMinutes(-10);
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() =>
-                new SimpleAgenda.Entities.Schedule(pastDate,10,0)
+
+            Assert.Throws<DateRangeException>(() =>
+                new SimpleAgenda.Entities.Schedule(pastDate, 10, 0)
             );
         }
 
@@ -30,14 +32,15 @@ namespace SimpleAgendaTest.UnitTests.Entities.Schedule
         }
 
         [Fact]
-        public void Should_ThrowException_When_EndDateIsBeforeStartDate()
+        public void Should_ThrowDomainException_When_EndDateIsBeforeStartDate()
         {
             // Arrange
             var startDate = DateTime.UtcNow.AddHours(1);
             var endDate = startDate.AddMinutes(-1);
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() =>
+
+            Assert.Throws<DateRangeException>(() =>
                 new SimpleAgenda.Entities.Schedule(startDate, 9, 0, endDate)
             );
         }
@@ -55,19 +58,20 @@ namespace SimpleAgendaTest.UnitTests.Entities.Schedule
             var schedule = new SimpleAgenda.Entities.Schedule(start, 7, 30, null, RecurrenceTypeEnum.DAILY, interval);
 
             // Assert
-            Assert.Equal(interval, schedule.RecurrenceInterval);
+            Assert.Equal(interval, schedule.Recurrence.RecurrenceInterval);
         }
 
         [Theory]
         [InlineData(0)]
         [InlineData(-1)]
-        public void Should_ThrowException_When_RecurrenceIntervalIsInvalid(int invalidInterval)
+        public void Should_ThrowDomainException_When_RecurrenceIntervalIsInvalid(int invalidInterval)
         {
             // Arrange
             var start = DateTime.UtcNow.AddMinutes(1);
 
             // Act & Assert
-            Assert.Throws<InvalidOperationException>(() =>
+            
+            Assert.Throws<RecurrenceException>(() =>
                 new SimpleAgenda.Entities.Schedule(start, 7, 30, null, RecurrenceTypeEnum.DAILY, invalidInterval)
             );
         }

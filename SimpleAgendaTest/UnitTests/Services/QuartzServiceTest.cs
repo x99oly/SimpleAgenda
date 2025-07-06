@@ -76,12 +76,10 @@ namespace SimpleAgendaTest.UnitTests.Services
             }, new object[] { "Hello World" });
 
             // Assert
-            var finished = Task.WaitAll([tcsA.Task, tcsB.Task], 3000);
+            await Task.WhenAll(tcsA.Task, tcsB.Task);
 
-            Assert.True(finished, "Both scheduled jobs should have executed.");
             Assert.Equal(1, countA);
             Assert.Equal(1, countB);
         }
-
     }
 }

@@ -58,6 +58,7 @@ Valores possíveis:
 IEnumerable<Appointment> GetAppointmentsBetween(DateOnly from, DateOnly to)
  */
 using SimpleAgenda.Enums;
+using SimpleAgenda.Exceptions;
 
 namespace SimpleAgenda.Entities
 {
@@ -65,13 +66,8 @@ namespace SimpleAgenda.Entities
     {
         public Guid Id { get; private set; } = Guid.NewGuid();
         public DateRange StartAndEndRangeDates {  get; private set; }
-        public RecurrenceTypeEnum RecurrenceType { get; private set; } = RecurrenceTypeEnum.WEEKLY;
-        public int RecurrenceInterval { get; private set; } = 1;
-        public HourMinute RecurrenceTime { get; private set; }
-        // # RecurrenceWeekDays - Start with four position, since not all days of the week are required.
-        public HashSet<DayOfWeek> RecurrenceWeekDays { get; private set; } = [];
+        public Recurrence Recurrence { get; private set; }
         public List<Appointment> CancelledAppointments { get; private set; } = [];
-        public List<DateOnly> LockedDates { get; private set; } = [];
         public List<Appointment> PendingAppointments { get; private set; } = [];
 
         /// <summary>
@@ -89,16 +85,32 @@ namespace SimpleAgenda.Entities
             int recurrenceInterval = 1, IEnumerable<DayOfWeek>? daysOfWeek=null)
         {
             StartAndEndRangeDates = new(startDate, endDate ?? DateTime.UtcNow.AddYears(100));
-            RecurrenceType = recurrenceType;
-            RecurrenceTime = new HourMinute(hour, minutes);
-            RecurrenceWeekDays = daysOfWeek is not null ? [..daysOfWeek!] : [];
 
-            RecurrenceInterval = recurrenceInterval > 0
-                ? recurrenceInterval :
-                throw new InvalidOperationException(
-                    $"The provided recurrency '{recurrenceInterval}' must be greater than 0.");
+            Recurrence = new Recurrence(
+                recurrenceType,
+                recurrenceInterval,
+                new HourMinute(hour, minutes),
+                new DaysOfWeekCollection(daysOfWeek));
         }
 
+
+    }
+
+    internal readonly struct Recurrence(RecurrenceTypeEnum recurrenceType, int recurrenceInterval, HourMinute recurrenceTime, 
+        DaysOfWeekCollection daysOfWeek)
+    {
+        public readonly RecurrenceTypeEnum RecurrenceType { get; init; } = recurrenceType;
+        public readonly int RecurrenceInterval { get; init; } = RecurrenceIntervalValidador(recurrenceInterval);
+        public readonly HourMinute RecurrenceTime { get; init; } = recurrenceTime;
+        public readonly DaysOfWeekCollection DaysOfWeek { get; init; } = daysOfWeek;
+
+        private static int RecurrenceIntervalValidador(int recurrenceInterval)
+        {
+            if (recurrenceInterval <= 0)
+                throw new RecurrenceException(recurrence:recurrenceInterval);
+
+            return recurrenceInterval;
+        }
 
     }
 
@@ -106,12 +118,12 @@ namespace SimpleAgenda.Entities
     {
         public readonly DateTime StartDate = StartDate >= DateTime.UtcNow
             ? StartDate 
-            : throw new ArgumentException(
+            : throw new DateRangeException(
                 $"The provided date '{StartDate}' cannot be early than the current date '{DateTime.UtcNow}-UTC'.");
 
         public readonly DateTime EndDate =  EndDate > StartDate
             ? EndDate
-            : throw new ArgumentException(
+            : throw new DateRangeException(
                 $"The provided 'End Date' is null or smaller than 'Start Date'.");
     }
 
@@ -119,10 +131,10 @@ namespace SimpleAgenda.Entities
     {
         public readonly int Hour = Hours is < 24 and >= 0
             ? Hours
-            : throw new ArgumentException(nameof(Hour), $"Hour must be between 0 and 23. Received: {Hours}");
+            : throw new InvalidHourException(hour:Hours);
         public readonly int Minute = Minutes is < 60 and >= 0
             ? Minutes
-            : throw new ArgumentException(nameof(Minutes), $"Minute must be between 0 and 59. Received: {Minutes}");
+            : throw new InvalidMinuteException(minute: Hours);
 
         public readonly TimeSpan AsTimeSpan()
             => new(Hour, Minute, 0);
@@ -155,6 +167,5 @@ namespace SimpleAgenda.Entities
         public override string ToString()
             => string.Join(", ", AsEnumerable());
     }
-
 
 }
