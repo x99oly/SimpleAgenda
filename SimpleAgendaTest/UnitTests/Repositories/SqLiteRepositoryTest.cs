@@ -115,7 +115,7 @@ namespace SimpleAgendaTest.UnitTests.Repositories
                 City = "Cidade Teste",
                 PostalCode = "12345-678",
                 Country = "País Teste",
-                State = BrazilStatesEnum.MG,
+                State = ['M','G'],
                 Complement = "Complemento Teste"
             };
             // Act
@@ -269,63 +269,6 @@ namespace SimpleAgendaTest.UnitTests.Repositories
         }
 
         [Fact]
-        public async Task GetListWithFilteringDate()
-        {
-            string dbfile = "GetListWithFilteringDate.db";
-            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
-            var repo = new AgendaRepository<AppointmentDto>(context);
-
-            var newAppointment0 = new AppointmentDto
-            {
-                Date = DateTime.Today.AddDays(1),
-                Event = new EventDto
-                {
-                    Title = "Evento Público 1",
-                    Description = "Evento criado para teste"
-                }
-            };
-
-            var newAppointment1 = new AppointmentDto
-            {
-                Date = DateTime.Today.AddDays(3),
-                Event = new EventDto
-                {
-                    Title = "Evento Público 2",
-                    Description = "Evento criado para teste"
-                }
-            };
-
-            var newAppointment2 = new AppointmentDto
-            {
-                Date = DateTime.Today.AddDays(5),
-                Event = new EventDto
-                {
-                    Title = "Evento Público 3",
-                    Description = "Evento criado para teste"
-                }
-            };
-
-            await repo.Create(newAppointment0);
-            await repo.Create(newAppointment1);
-            await repo.Create(newAppointment2);
-
-            // Act
-            var filter = new QueryDto
-            {
-                DateStart = DateTime.Today.AddDays(2),
-                DateEnd = DateTime.Today.AddDays(4)
-            };
-
-            var results = await repo.GetList<Appointment>(filter);
-
-            // Assert
-            Assert.NotNull(results);
-            Assert.Single(results); // apenas newAppointment1 deve estar no range
-            Assert.Equal("Evento Público 2", results[0].Event.Title);
-
-        }
-
-        [Fact]
         public async Task GetListWithFilteringByAppointmentId()
         {
             string dbfile = "GetListWithFilteringByAppointmentId.db";
@@ -376,82 +319,7 @@ namespace SimpleAgendaTest.UnitTests.Repositories
             Assert.NotNull(resultsNotExists);
             Assert.Empty(resultsNotExists);
         }
-
-        [Fact]
-        public async Task GetListWithFilteringDateRange()
-        {
-            string dbfile = "GetListWithFilteringDateRange.db";
-            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
-            var repo = new AgendaRepository<AppointmentDto>(context);
-
-            var appointment0 = new AppointmentDto
-            {
-                Id = 1,
-                Date = DateTime.Today.AddDays(1),
-                Event = new EventDto
-                {
-                    Id = 10,
-                    Title = "Evento 1",
-                    Description = "Teste range 1"
-                }
-            };
-
-            var appointment1 = new AppointmentDto
-            {
-                Id = 2,
-                Date = DateTime.Today.AddDays(3),
-                Event = new EventDto
-                {
-                    Id = 20,
-                    Title = "Evento 2",
-                    Description = "Teste range 2"
-                }
-            };
-
-            var appointment2 = new AppointmentDto
-            {
-                Id = 3,
-                Date = DateTime.Today.AddDays(5),
-                Event = new EventDto
-                {
-                    Id = 30,
-                    Title = "Evento 3",
-                    Description = "Teste range 3"
-                }
-            };
-
-            await repo.Create(appointment0);
-            await repo.Create(appointment1);
-            await repo.Create(appointment2);
-
-            // Act: filtro por intervalo (do dia 2 ao dia 4, deve pegar só o do dia 3)
-            var filter = new QueryDto
-            {
-                DateStart = DateTime.Today.AddDays(2),
-                DateEnd = DateTime.Today.AddDays(4)
-            };
-
-            var results = await repo.GetList<Appointment>(filter);
-
-            // Assert
-            Assert.NotNull(results);
-            Assert.Single(results);
-            Assert.Equal("Evento 2", results[0].Event.Title);
-
-            // Act: intervalo que não pega nenhum
-            var emptyFilter = new QueryDto
-            {
-                DateStart = DateTime.Today.AddDays(6),
-                DateEnd = DateTime.Today.AddDays(7)
-            };
-
-            var emptyResults = await repo.GetList<Appointment>(emptyFilter);
-
-            // Assert vazio
-            Assert.NotNull(emptyResults);
-            Assert.Empty(emptyResults);
-        }
-
+               
         [Fact]
         public async Task GetListWithFilteringByStatus()
         {
@@ -463,7 +331,7 @@ namespace SimpleAgendaTest.UnitTests.Repositories
             {
                 Id = 1,
                 Date = DateTime.Today.AddDays(1),
-                Status = StatusEnum.PENDING,
+                Status = StatusEnum.ACTIVE,
                 Event = new EventDto { Id = 10, Title = "Evento A", Description = "Desc A" }
             };
 
@@ -471,21 +339,21 @@ namespace SimpleAgendaTest.UnitTests.Repositories
             {
                 Id = 2,
                 Date = DateTime.Today.AddDays(2),
-                Status = StatusEnum.CONFIRMED,
+                Status = StatusEnum.RESCHEDULED,
                 Event = new EventDto { Id = 20, Title = "Evento B", Description = "Desc B" }
             };
 
             await repo.Create(appointment0);
             await repo.Create(appointment1);
 
-            var filterPending = new QueryDto { Status = StatusEnum.PENDING };
+            var filterPending = new QueryDto { StatusIn = [StatusEnum.ACTIVE] };
             var resultsPending = await repo.GetList<Appointment>(filterPending);
 
             Assert.NotNull(resultsPending);
             Assert.Single(resultsPending);
-            Assert.Equal(StatusEnum.PENDING, resultsPending[0].Status);
+            Assert.Equal(StatusEnum.ACTIVE, resultsPending[0].Status);
 
-            var filterCancelled = new QueryDto { Status = StatusEnum.CANCELLED };
+            var filterCancelled = new QueryDto { StatusIn = [StatusEnum.CANCELED] };
             var resultsCancelled = await repo.GetList<Appointment>(filterCancelled);
 
             Assert.NotNull(resultsCancelled);
@@ -503,7 +371,7 @@ namespace SimpleAgendaTest.UnitTests.Repositories
             {
                 Id = 1,
                 Date = DateTime.Today.AddDays(1),
-                Status = StatusEnum.PENDING,
+                Status = StatusEnum.ACTIVE,
                 Event = new EventDto { Id = 10, Title = "Evento A", Description = "Desc A" }
             };
 
@@ -511,7 +379,7 @@ namespace SimpleAgendaTest.UnitTests.Repositories
             {
                 Id = 2,
                 Date = DateTime.Today.AddDays(2),
-                Status = StatusEnum.CONFIRMED,
+                Status = StatusEnum.ACTIVE,
                 Event = new EventDto { Id = 20, Title = "Evento B", Description = "Desc B" }
             };
 
@@ -519,7 +387,7 @@ namespace SimpleAgendaTest.UnitTests.Repositories
             {
                 Id = 3,
                 Date = DateTime.Today.AddDays(3),
-                Status = StatusEnum.CANCELLED,
+                Status = StatusEnum.CANCELED,
                 Event = new EventDto { Id = 30, Title = "Evento C", Description = "Desc C" }
             };
 
@@ -529,54 +397,16 @@ namespace SimpleAgendaTest.UnitTests.Repositories
 
             var filter = new QueryDto
             {
-                StatusIn = [StatusEnum.PENDING, StatusEnum.CONFIRMED]
+                StatusIn = [StatusEnum.ACTIVE, StatusEnum.ACTIVE]
             };
 
             var results = await repo.GetList<Appointment>(filter);
 
             Assert.NotNull(results);
             Assert.Equal(2, results.Count);
-            Assert.DoesNotContain(results, a => a.Status == StatusEnum.CANCELLED);
+            Assert.DoesNotContain(results, a => a.Status == StatusEnum.CANCELED);
         }
-
-        [Fact]
-        public async Task GetListWithIncludeCancelledFalseFiltersOutCancelled()
-        {
-            string dbfile = "GetListWithIncludeCancelledFalseFiltersOutCancelled.db";
-            var context = new SqliteContext($"Data Source={DbPath}/{dbfile}");
-            var repo = new AgendaRepository<AppointmentDto>(context);
-
-            var appointment0 = new AppointmentDto
-            {
-                Id = 1,
-                Date = DateTime.Today.AddDays(1),
-                Status = StatusEnum.CANCELLED,
-                Event = new EventDto { Id = 10, Title = "Evento A", Description = "Desc A" }
-            };
-
-            var appointment1 = new AppointmentDto
-            {
-                Id = 2,
-                Date = DateTime.Today.AddDays(2),
-                Status = StatusEnum.PENDING,
-                Event = new EventDto { Id = 20, Title = "Evento B", Description = "Desc B" }
-            };
-
-            await repo.Create(appointment0);
-            await repo.Create(appointment1);
-
-            var filter = new QueryDto
-            {
-                IncludeCancelled = false
-            };
-
-            var results = await repo.GetList<Appointment>(filter);
-
-            Assert.NotNull(results);
-            Assert.Single(results);
-            Assert.DoesNotContain(results, a => a.Status == StatusEnum.CANCELLED);
-        }
-
+                
         [Fact]
         public async Task GetListWithFilteringByEventTitle()
         {
@@ -672,7 +502,7 @@ namespace SimpleAgendaTest.UnitTests.Repositories
                         City = "CityX",
                         PostalCode = "00001",
                         Country = "CountryA",
-                        State = BrazilStatesEnum.SP
+                        State = ['S','P']
                     }
                 }
             };
@@ -693,7 +523,7 @@ namespace SimpleAgendaTest.UnitTests.Repositories
                         City = "CityY",
                         PostalCode = "00002",
                         Country = "CountryB",
-                        State = BrazilStatesEnum.RJ
+                        State = ['R','J']
                     }
                 }
             };

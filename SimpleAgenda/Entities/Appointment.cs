@@ -15,7 +15,7 @@ namespace SimpleAgenda.Entities
     internal class Appointment : IDtoConvertable<AppointmentDto>, IPublicDtoConvertable<AppointmentOutDto>, IQueryFilter<AppointmentDto>
     {
         internal readonly int Id;
-        internal StatusEnum Status { get; private set; } = StatusEnum.PENDING;
+        internal StatusEnum Status { get; private set; } = StatusEnum.ACTIVE;
         internal DateTime Date { get; private set; }
         internal Event Event { get; private set; }
 
@@ -102,28 +102,15 @@ namespace SimpleAgenda.Entities
         {
             // Appointment filters
             if (param.AppointmentId.HasValue)
-                query = query.Where(a => a.Id == param.AppointmentId.Value);
+                return query.Where(a => a.Id == param.AppointmentId.Value);
 
             if (param.Date.HasValue)
                 query = query.Where(a => a.Date == param.Date);
 
-            if (param.DateStart.HasValue && param.DateEnd.HasValue)
-                query = query.Where(a => a.Date >= param.DateStart.Value && a.Date <= param.DateEnd.Value);
-            else if (param.DateStart.HasValue)
-                query = query.Where(a => a.Date >= param.DateStart.Value);
-            else if (param.DateEnd.HasValue)
-                query = query.Where(a => a.Date <= param.DateEnd.Value);
-
             // Status filters
-            if (param.Status.HasValue)
-                query = query.Where(a => a.Status == param.Status);
-
-            if (param.StatusIn is { Count: > 0 })
-                query = query.Where(a => param.StatusIn.Contains(a.Status));
-
-            if (param.IncludeCancelled.HasValue && !param.IncludeCancelled.Value)
-                query = query.Where(a => a.Status != StatusEnum.CANCELLED);
-
+            if (param.StatusIn is not null && param.StatusIn.Any())
+                query = query.Where(a => param.StatusIn.Contains(a.Status));            
+           
             // Delegar para o filtro de Event            
             query = Event.ApplyFilter(query, param);
 
@@ -156,6 +143,7 @@ namespace SimpleAgenda.Entities
 
             return query;
         }
+    
     }
 
 

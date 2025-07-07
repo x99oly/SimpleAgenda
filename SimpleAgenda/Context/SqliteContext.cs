@@ -80,7 +80,7 @@ namespace SimpleAgenda.Context
             modelBuilder.Entity<AppointmentDto>()
                 .HasOne<ScheduleDto>()
                 .WithOne()
-                .HasForeignKey("schedule_id")
+                .HasForeignKey<ScheduleDto>("schedule_id")
                 .IsRequired(true);
 
             // Configuring ScheduleDto

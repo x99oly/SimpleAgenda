@@ -3,15 +3,16 @@ using SimpleAgenda.Exceptions;
 
 namespace SimpleAgenda.Entities
 {
-    internal readonly struct Recurrence(RecurrenceTypeEnum recurrenceType, int recurrenceInterval, HourMinute recurrenceTime,
+    internal readonly struct Recurrence(RecurrenceTypeEnum recurrenceType, int recurrenceInterval, int recurrenceLimit, HourMinute recurrenceTime,
     DaysOfWeekCollection daysOfWeek)
     {
         public readonly RecurrenceTypeEnum RecurrenceType { get; init; } = recurrenceType;
-        public readonly int RecurrenceInterval { get; init; } = ValidateRecurrenceInterval(recurrenceInterval);
+        public readonly int RecurrenceInterval { get; init; } = ValidateRecurrence(recurrenceInterval);
+        public readonly int RecurrenceLimit { get; init; } = ValidateRecurrence(recurrenceLimit);
         public readonly HourMinute RecurrenceTime { get; init; } = recurrenceTime;
         public readonly DaysOfWeekCollection DaysOfWeek { get; init; } = daysOfWeek;
 
-        private static int ValidateRecurrenceInterval(int recurrenceInterval)
+        private static int ValidateRecurrence(int recurrenceInterval)
         {
             if (recurrenceInterval <= 0)
                 throw new RecurrenceException(recurrence: recurrenceInterval);

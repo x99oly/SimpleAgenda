@@ -8,8 +8,9 @@ namespace SimpleAgenda.Enums
 {
     public enum StatusEnum
     {
-        CANCELLED,  // Cancelado
-        CONFIRMED,  // Confirmado
-        PENDING    // Pendente
+        FINISHED,
+        ACTIVE,
+        CANCELED,
+        RESCHEDULED,
     }
 }

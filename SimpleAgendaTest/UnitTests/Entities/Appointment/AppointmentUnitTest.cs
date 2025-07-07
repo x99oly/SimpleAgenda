@@ -193,7 +193,7 @@ namespace SimpleAgendaTests.UnitTests.Entities.Appointment
                         Number = "200",
                         Neighborhood = "Centro",
                         City = "Cidade Atualizada",
-                        State = BrazilStatesEnum.SP,
+                        State = "SP",
                         Country = "Brasil"
                     }
                 }
@@ -211,7 +211,7 @@ namespace SimpleAgendaTests.UnitTests.Entities.Appointment
                         Number = "200",
                         Neighborhood = "Centro",
                         City = "Cidade Atualizada",
-                        State = BrazilStatesEnum.SP,
+                        State = "SP",
                         Country = "Brasil"
                     }
                 }
@@ -246,7 +246,7 @@ namespace SimpleAgendaTests.UnitTests.Entities.Appointment
                         Number = "100",
                         Neighborhood = "Bairro A",
                         City = "Cidade A",
-                        State = BrazilStatesEnum.SP,
+                        State = "SP",
                         Country = "Brasil"
                     }
                 }
@@ -267,7 +267,7 @@ namespace SimpleAgendaTests.UnitTests.Entities.Appointment
                         Number = "101",
                         Neighborhood = "Bairro Novo",
                         City = "Cidade Nova",
-                        State = BrazilStatesEnum.RJ,
+                        State = "RJ",
                         Country = "Brasil",
                         Complement = "Próximo à praça"
                     }

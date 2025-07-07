@@ -13,7 +13,7 @@ namespace SimpleAgenda.Entities
         internal string Number { get; private set; }
         internal string Neighborhood { get; private set; }
         internal string City { get; private set; }
-        internal BrazilStatesEnum State { get; private set; }
+        internal char[] State { get; private set; }
         internal string Country { get; private set; }
         internal string Complement { get; private set; }
 
@@ -63,13 +63,13 @@ namespace SimpleAgenda.Entities
             return value!.NullOrEmptyValidator();
         }
 
-        private static BrazilStatesEnum StateValidator(string? value)
+        private static char[] StateValidator(string? value)
         {
-            value = value.NullOrEmptyValidator();
-            if (!Enum.TryParse(value, out BrazilStatesEnum estado))
-                throw new ArgumentException("The provided value is not a valid state of Brazil.");
+            value.NullOrEmptyValidator();
+            if (value!.Length < 2)
+                throw new ArgumentException("The provided value doesn't have the correct length for a state code.");
 
-            return estado;
+            return value!.ToCharArray();
         }
 
         public LocationOutDto ConvertToPublicDto()
@@ -81,7 +81,7 @@ namespace SimpleAgenda.Entities
                 Number = Number,
                 Neighborhood = Neighborhood,
                 City = City,
-                State = State,
+                State = "SP",
                 Country = Country,
                 Complement = Complement
             };
@@ -111,7 +111,7 @@ namespace SimpleAgenda.Entities
                 Number = location.Number ?? Number,
                 Neighborhood = location.Neighborhood ?? Neighborhood,
                 City = location.City ?? City,
-                State = location.State ?? State,
+                State = location.State is not null ? StateValidator(location.State) : State,
                 Country = location.Country ?? Country,
                 Complement = location.Complement ?? Complement
             };
@@ -134,8 +134,8 @@ namespace SimpleAgenda.Entities
             if (!string.IsNullOrWhiteSpace(param.City))
                 query = query.Where(a => a.Event.Location != null && a.Event.Location.City.Contains(param.City));
 
-            if (param.State.HasValue)
-                query = query.Where(a => a.Event.Location != null && a.Event.Location.State == param.State);
+            if (param.State is not null && param.State.Any())
+                query = query.Where(a => a.Event.Location != null && new string(a.Event.Location.State.Take(2).ToArray()) == param.State);
 
             if (!string.IsNullOrWhiteSpace(param.Country))
                 query = query.Where(a => a.Event.Location != null && a.Event.Location.Country.Contains(param.Country));

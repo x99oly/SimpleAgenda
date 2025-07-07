@@ -45,8 +45,7 @@ Valores possíveis:
 ---
 ## 🔒 5. Controle de Exceções
 ### 5.1 `Exclusions`
-- Lista de `DateOnly`.
-- Se uma data estiver nessa lista, **nenhum Appointment será gerado nela**, mesmo que caia na regra.
+- **Funcionalidade descontinuada**
 ### 5.2 Overrides com Novo Schedule
 - Se um `Appointment` for alterado (ex: horário ou conteúdo diferente), a estratégia é:
   1. Criar um novo `Schedule` com `RepeatCount = 1` e `StartDate = data modificada`
@@ -59,6 +58,7 @@ IEnumerable<Appointment> GetAppointmentsBetween(DateOnly from, DateOnly to)
  */
 using SimpleAgenda.Enums;
 using SimpleAgenda.Exceptions;
+using System.Reflection.Metadata.Ecma335;
 
 namespace SimpleAgenda.Entities
 {
@@ -82,18 +82,59 @@ namespace SimpleAgenda.Entities
         /// <param name="days">Coleção de dias da semana a serem incluídos na recorrência. Pode ser nula ou vazia.</param>
         public Schedule(DateTime startDate, int hour, int minutes, DateTime? endDate = null, 
             RecurrenceTypeEnum recurrenceType = RecurrenceTypeEnum.WEEKLY, 
-            int recurrenceInterval = 1, IEnumerable<DayOfWeek>? daysOfWeek=null)
+            int recurrenceInterval = 1, int recurrenceLitmit = int.MaxValue, IEnumerable<DayOfWeek>? daysOfWeek=null)
         {
             StartAndEndRangeDates = new(startDate, endDate ?? DateTime.UtcNow.AddYears(100));
 
             Recurrence = new Recurrence(
-                recurrenceType,
-                recurrenceInterval,
-                new HourMinute(hour, minutes),
-                new DaysOfWeekCollection(daysOfWeek));
+                recurrenceType:recurrenceType,
+                recurrenceInterval:recurrenceInterval,
+                recurrenceLimit:recurrenceLitmit,
+                recurrenceTime:new HourMinute(hour, minutes),
+                daysOfWeek:new DaysOfWeekCollection(daysOfWeek));
         }
+
+
+
+        public IEnumerable<DayOfWeek> GetSchedulesDays() => Recurrence.DaysOfWeek.AsEnumerable();
 
 
     }
 
 }
+
+/*
+# Checklist de Métodos para a Classe `Schedule`
+
+## Ordem sugerida para desenvolvimento
+
+- [ ] **1. `GetValidDateRange()`**  
+  - Retorna o intervalo válido de datas da Schedule (`StartDate` até `EndDate`).
+
+- [ok] **2. `GetValidDaysOfWeek()`**  
+  - Retorna a lista dos dias da semana válidos para a recorrência (com fallback para `StartDate.DayOfWeek`).
+
+- [ ] **3. `GenerateOccurrences(DateOnly from, DateOnly to)`**  
+  - Gera as ocorrências (datas + horários) de Appointments dentro do intervalo fornecido, respeitando a regra da Schedule.
+
+- [ ] **4. `IsOccurrence(DateTime date)`**  
+  - Verifica se uma data específica está dentro da recorrência da Schedule.
+
+- [ ] **5. `GetNextOccurrence(DateTime after)`**  
+  - Retorna a próxima ocorrência válida após a data informada.
+
+- [ ] **6. `GetTotalOccurrences()`**  
+  - Calcula o total de ocorrências possíveis da Schedule, respeitando limites.
+
+- [ ] **7. Métodos para exclusões (opcional)**  
+  - Adicionar/remover datas excluídas (se implementado na classe).
+
+- [ ] **8. `ToString()` / Representação legível**  
+  - Retorna uma string descritiva da regra da Schedule para debugging ou exibição.
+
+---
+
+> **Observação:**  
+> Métodos relacionados a exclusões, cancelamentos e sobrescritas são recomendados para serem implementados em camadas superiores, fora da classe `Schedule`.
+ 
+*/

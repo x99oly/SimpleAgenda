@@ -9,7 +9,7 @@ namespace SimpleAgenda.DTOS.Publics
         public string? Number { get; set; }
         public string? Neighborhood { get; set; } // Adicionado caso precise
         public string? City { get; set; }
-        public BrazilStatesEnum? State { get; set; }
+        public string? State { get; set; }
         public string? Country { get; set; }
         public string? Complement { get; set; }
     }

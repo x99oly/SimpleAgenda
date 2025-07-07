@@ -75,7 +75,7 @@ namespace SimpleAgenda.Entities
         public static IQueryable<AppointmentDto> ApplyFilter(IQueryable<AppointmentDto> query, QueryDto param)
         {
             if (param.EventId.HasValue)
-                query = query.Where(a => a.Event.Id == param.EventId.Value);
+                return query.Where(a => a.Event.Id == param.EventId.Value);
 
             if (!string.IsNullOrWhiteSpace(param.EventTitle))
                 query = query.Where(a => a.Event.Title.Contains(param.EventTitle));

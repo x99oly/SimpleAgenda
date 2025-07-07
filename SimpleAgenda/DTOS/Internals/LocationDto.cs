@@ -24,7 +24,7 @@ namespace SimpleAgenda.DTOS.Internals
         public string City { get; set; } = string.Empty;
 
         [Required]
-        public BrazilStatesEnum State { get; set; } = default;
+        public char[] State { get; set; } = [];
 
         [Required]
         public string Country { get; set; } = string.Empty;

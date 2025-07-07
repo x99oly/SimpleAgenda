@@ -6,7 +6,7 @@ namespace SimpleAgenda.DTOS.Publics
     public class AppointmentOutDto
     {
         public int Id { get; set; } = 0;
-        public StatusEnum Status { get; set; } = StatusEnum.PENDING;
+        public StatusEnum Status { get; set; } = StatusEnum.ACTIVE;
         public DateTime? Date { get; set; } = null;
         public EventOutDto Event { get; set; } = null!;
     }

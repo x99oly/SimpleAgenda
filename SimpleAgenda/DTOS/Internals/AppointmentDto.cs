@@ -14,6 +14,6 @@ namespace SimpleAgenda.DTOS.Internals
         [Required]
         public EventDto Event { get; set; } = null!;
 
-        public StatusEnum Status { get; set; } = StatusEnum.PENDING;
+        public StatusEnum Status { get; set; } = StatusEnum.ACTIVE;
     }
 }
